@@ -1,0 +1,40 @@
+%% parameters
+N = 1000;
+param.N = N;
+param.T = 0.01;
+iter = 1000;
+param.deltaJ_min = 0.1;
+
+% robot
+g = 9.81;
+l1 = 0.5;
+l2 = 0.5;
+m1 = 1;
+m2 = 1;
+I1 = 1/12*m1*l1^2;
+I2 = 1/12*m2*l2^2;
+d1 = l1/2;
+d2 = l2/2;
+param.a1 = I1 + m1*d1^2 + I2 + m2*(l1^2 + d2^2);
+param.a2 = m2*l1*d2;
+param.a3 = I2 + m2*d2^2;
+param.a4 = g*(m1*d1 + m2*l1);
+param.a5 = g*m2*d2;
+param.b1 = 0.1;
+param.b2 = 0.1;
+param.act = 1; % pendubot = 1, acrobot = 2
+
+% initial and reference states
+param.x0 = [0; 0; 0; 0]; % down-down
+param.x_star = [pi; 0; 0; 0]; % up-up
+
+% weights
+P0 = diag([0; 0; 10; 10]);
+Pf = diag([600; 400; 20; 20]);
+Tf = 100; % <= N+1, >= 1
+P = NaN(4, 4, N+1);
+P(:, :, 1:N+1-Tf) = repmat(P0, 1, 1, N+1-Tf);
+P(:, :, N+1-Tf+1:end) = repmat(Pf, 1, 1, Tf);
+param.P = P;
+param.R = 10;
+param.mu = 0;
